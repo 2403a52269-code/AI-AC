@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:ital,wght@0,400;0,700;1,400&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    /* Vibrant colorful theme */
+    :root{
+      --bg-1: #0f172a;        /* deep navy */
+      --bg-2: #0ea5a4;        /* teal */
+      --accent-1: #ff6b6b;    /* coral */
+      --accent-2: #ffd166;    /* mustard */
+      --accent-3: #7c3aed;    /* purple */
+      --accent-4: #06d6a0;    /* mint */
+      --card: rgba(255,255,255,0.95);
+      --text-dark: #0b1220;
+      --muted: rgba(11,18,32,0.6);
+      --glass: rgba(255,255,255,0.07);
+      --glass-2: rgba(255,255,255,0.12);
+    }
+
+    /* animated gradient background for header and accents */
+    .gradient-anim {
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-4));
+      background-size: 300% 300%;
+      animation: gradientShift 8s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    html { scroll-behavior: smooth; height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Open Sans', Arial, sans-serif;
+      /* subtle colorful page background */
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.06), transparent),
+                  radial-gradient(1000px 500px at 90% 90%, rgba(6,214,160,0.05), transparent),
+                  linear-gradient(180deg, #fbf8ff 0%, #fffef6 100%);
+      color: var(--text-dark);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    header {
+      color: white;
+      padding: 0.8rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 6px 18px rgba(12,18,36,0.12);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      /* apply animated gradient */
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-3));
+    }
+    header.gradient {
+      composes: gradient-anim;
+    }
+
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      display: inline-flex;
+      gap: 0.6rem;
+      align-items: center;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    .logo::before{
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(45deg,var(--accent-1),var(--accent-4));
+      box-shadow: 0 4px 12px rgba(124,58,237,0.24);
+      display: inline-block;
+      margin-right: 0.4rem;
+    }
+
+    ul.nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.6rem;
+      margin: 0;
+      padding: 0;
+    }
+    ul.nav-links li a {
+      color: rgba(255,255,255,0.95);
+      text-decoration: none;
+      font-size: 1.05rem;
+      transition: all 0.25s ease;
+      padding: 0.3em 0;
+      position: relative;
+    }
+    ul.nav-links li a:hover {
+      transform: translateY(-3px);
+      color: #fff;
+    }
+    /* colorful underline effect */
+    ul.nav-links li a::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+      border-radius: 8px;
+      transition: width 0.28s ease;
+    }
+    ul.nav-links li a:hover::after{ width: 100%; }
+
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      gap: 2.5rem;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(16,24,40,0.06);
+      padding: 2rem 1.5rem;
+      border-left: 8px solid transparent;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-left-color 0.18s ease;
+    }
+    section:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(16,24,40,0.08);
+    }
+    /* color each section's left border for energy */
+    #about { border-left-color: linear-gradient(180deg, var(--accent-1), var(--accent-3)); }
+    #projects { border-left-color: var(--accent-4); }
+    #skills { border-left-color: var(--accent-2); }
+    #contact { border-left-color: var(--accent-3); }
+
+    /* Since linear-gradient can't be used as border color directly, set subtle top accent line */
+    section::before{
+      content: "";
+      display: block;
+      height: 6px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      opacity: 0.12;
+    }
+
+    h2 {
+      font-family: 'Poppins', 'Montserrat', sans-serif;
+      margin-top: 0;
+      color: var(--text-dark);
+      font-size: 1.8rem;
+      letter-spacing: -0.2px;
+    }
+
+    .about-content {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.6rem;
+    }
+    .about-img {
+      flex: 0 0 120px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,var(--accent-3),var(--accent-1));
+      object-fit: cover;
+      box-shadow: 0 10px 30px rgba(124,58,237,0.18);
+      border: 4px solid rgba(255,255,255,0.6);
+    }
+    .about-text {
+      flex: 1;
+      min-width: 200px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .project-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,249,255,0.9));
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: transform 0.22s, box-shadow 0.22s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      border: 1px solid rgba(12,18,36,0.04);
+    }
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(12,18,36,0.08);
+    }
+    .project-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.15rem;
+      color: #2b2b3a;
+    }
+    .project-desc {
+      color: var(--muted);
+      font-size: 0.97rem;
+      flex: 1;
+    }
+    .project-link {
+      align-self: flex-start;
+      color: #06152a;
+      text-decoration: none;
+      background: linear-gradient(90deg,var(--accent-4),var(--accent-2));
+      border-radius: 10px;
+      padding: 0.45em 0.9em;
+      font-size: 0.95rem;
+      box-shadow: 0 6px 18px rgba(6,214,160,0.12);
+      transition: transform 0.16s, box-shadow 0.16s;
+      font-weight: 700;
+      color: white;
+    }
+    .project-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(7,128,105,0.14);
+    }
+
+    .contact-form {
+      display: grid;
+      gap: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      border: 1px solid rgba(11,18,32,0.06);
+      border-radius: 10px;
+      padding: 0.85em;
+      font-size: 1rem;
+      font-family: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,255,0.95));
+      resize: vertical;
+      box-shadow: 0 6px 18px rgba(11,18,32,0.03) inset;
+    }
+    .contact-form label {
+      font-weight: 700;
+      color: #322f3d;
+      margin-bottom: 0.3em;
+      display: block;
+    }
+    .contact-form button {
+      background: linear-gradient(90deg,var(--accent-1),var(--accent-3));
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 0.8em 1.3em;
+      font-size: 1.05rem;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+      box-shadow: 0 10px 28px rgba(124,58,237,0.12);
+    }
+    .contact-form button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(124,58,237,0.16);
+    }
+
+    /* Skills pills styling (can be overridden later) */
+    .skills-wrapper { max-width: 700px; margin: 0.5rem auto; padding: 0.6rem 0; }
+    .skills-track .skill {
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: none;
+      box-shadow: 0 8px 20px rgba(16,24,40,0.08);
+      transition: transform 0.12s ease;
+    }
+    .skills-track .skill:hover { transform: translateY(-3px) scale(1.03); }
+
+    @media (max-width:700px){
+      nav { flex-direction: column; gap: 0.6rem; }
+      main { padding: 0 0.6rem; gap: 1.6rem; }
+      .about-content { flex-direction: column; align-items: flex-start; }
+      section { padding: 1.1rem; }
+      h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <span class="logo">MyPortfolio</span>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <!-- About Section -->
+    <section id="about">
+      <h2>About</h2>
+      <div class="about-content">
+        <div class="about-text">
+          <p>
+            Hi! I'm <strong>Pranith Reddy</strong>, a passionate web developer specializing in modern, responsive front-end and user experiences. I have an interest in exploring new knowledge about modern technology &amp; apps.<br>
+            <br>
+            My skills include HTML, CSS, JavaScript, React, and Python. I am interested in learning new technologies and collaborating on interesting projects!
+          </p>
+        </div>
+      </div>
+    </section>
+    <style>
+      /* Skills marquee styles */
+      .skills-wrapper {
+        overflow: hidden;
+        padding: 0.6rem 0;
+        width: 100%;
+        max-width: 600px; /* Limit width to show ~3 skills */
+        margin: 0 auto;
+      }
+      .skills-track {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Show 3 skills at once */
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .skill {
+        display: inline-block;
+        background: var(--accent);
+        color: var(--text-light);
+        padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 2px 6px rgba(34,34,59,0.06);
+    text-transform: none;
+    font-size: 0.95rem;
+  }
+  @keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Make sure the skills section matches existing section styling */
+  #skills {
+    margin-top: 1.5rem;
+  }
+  @media (max-width:700px) {
+    .skills-track { gap: 0.6rem; animation-duration: 14s; }
+    .skill { padding: 0.45rem 0.8rem; font-size: 0.9rem; }
+  }
+</style>    
+    <!-- Projects Section -->
+    <style>
+      /* enable horizontal scrolling of skills and pause on hover */
+      .skills-track {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        width: max-content;
+        animation: scroll-left 12s linear infinite;
+        will-change: transform;
+      }
+      .skills-track:hover {
+        animation-play-state: paused;
+      }
+      .skills-track .skill {
+        flex: 0 0 auto;
+        color: var(--text-light);
+        font-weight: 700;
+      }
+    </style>
+
+    <script>
+      (function() {
+        const palette = ['#ff6b6b','#f7b267','#ffd166','#06d6a0','#118ab2','#9b5de5','#f15bb5','#00c2a8','#e76f51','#2a9d8f'];
+        const skills = document.querySelectorAll('.skills-track .skill');
+        skills.forEach((el, i) => {
+          el.style.background = palette[i % palette.length];
+          el.style.color = '#fff';
+        });
+        // ensure animation is applied (in case styles load late)
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.skills-track').forEach(t => {
+            if (!t.style.animation) t.style.animation = 'scroll-left 12s linear infinite';
+          });
+        });
+      })();
+    </script>
+    <section id="projects">
+      <h2>Projects</h2>
+      <div class="projects-grid">
+        <div class="project-card">
+          <span class="project-title">Portfolio Website</span>
+          <div class="project-desc">A modern personal website with a blog and showcase gallery. Built with React and deployed with Netlify.</div>
+          <a class="project-link" href="#" target="_blank" rel="noopener noreferrer">View Project</a>
+        </div>
+        <div class="project-card">
+          <span class="project-title">Sports Registration Portal</span>
+          <div class="project-desc">A mini sports registration website where users can register for sports events, featuring drag &amp; drop and persistent storage.</div>
+          <a class="project-link" href="#" target="_blank" rel="noopener noreferrer">View Project</a>
+        </div>
+      </div>
+    </section>
+    <!-- Skills Section -->
+<section id="skills">
+  <h2>Skills</h2>
+  <div class="skills-wrapper" aria-label="Scrolling list of skills">
+    <div class="skills-track" role="list">
+      <span class="skill" role="listitem">Python</span>
+      <span class="skill" role="listitem">C</span>
+      <span class="skill" role="listitem">HTML</span>
+      <span class="skill" role="listitem">CSS</span>
+      <span class="skill" role="listitem">JavaScript</span>
+      <!-- duplicate for seamless scrolling -->
+      <span class="skill" role="listitem">Python</span>
+      <span class="skill" role="listitem">C</span>
+      <span class="skill" role="listitem">HTML</span>
+      <span class="skill" role="listitem">CSS</span>
+      <span class="skill" role="listitem">JavaScript</span>
+        </div>
+      </div>
+    </section>
+
+    
+    <!-- Contact Section -->
+    <section id="contact">
+      <h2>Contact Details</h2>
+      <p>Name:   Pranith Reddy</p>
+      <p>Email: pranith.reddy@example.com</p>
+      <p>Phone: (123) 456-7890</p>
+    </section>
+  </main>
+</body>
+
+
+</body>
+</html>
