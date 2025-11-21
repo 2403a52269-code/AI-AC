@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #addBtn {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        #addBtn:hover {
+            background: #5568d3;
+        }
+
+        #taskList {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .task-item:hover {
+            background: #e9ecef;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .task-text {
+            flex: 1;
+            color: #333;
+            font-size: 16px;
+            word-break: break-word;
+        }
+
+        /* Strikethrough styling for completed tasks */
+        .task-item input[type="checkbox"]:checked + .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .delete-btn {
+            padding: 8px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Task Manager</h1>
+        
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="taskInput" 
+                placeholder="Enter a new task..." 
+                aria-label="Task input field"
+            >
+            <button id="addBtn" aria-label="Add task button">Add</button>
+        </div>
+
+        <ul id="taskList" role="list">
+            <li class="empty-state">No tasks yet. Add one to get started!</li>
+        </ul>
+    </div>
+
+    <script>
+        /**
+         * Task Manager Application
+         * 
+         * Features:
+         * - Add new tasks via input field
+         * - Mark tasks as complete with checkbox (applies strikethrough)
+         * - Delete tasks from the list
+         * - Persistent state management
+         * - Keyboard support (Enter to add task)
+         * 
+         * @author Task Manager
+         * @version 1.0
+         */
+
+        const taskInput = document.getElementById('taskInput');
+        const addBtn = document.getElementById('addBtn');
+        const taskList = document.getElementById('taskList');
+        const STORAGE_KEY = 'tasks';
+
+        /**
+         * Initialize the app by loading saved tasks from localStorage
+         */
+        function initApp() {
+            loadTasks();
+            attachEventListeners();
+        }
+
+        /**
+         * Attach event listeners to buttons and input
+         */
+        function attachEventListeners() {
+            addBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+        }
+
+        /**
+         * Add a new task to the list
+         * Test Case 1: Adding a valid task
+         * Test Case 2: Adding empty task (should be prevented)
+         */
+        function addTask() {
+            const taskText = taskInput.value.trim();
+
+            // Validation: prevent empty tasks
+            if (taskText === '') {
+                alert('Please enter a task!');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                text: taskText,
+                completed: false
+            };
+
+            addTaskToDOM(task);
+            saveTasks();
+            taskInput.value = '';
+            taskInput.focus();
+        }
+
+        /**
+         * Add task element to the DOM
+         * 
+         * @param {Object} task - Task object with id, text, and completed status
+         */
+        function addTaskToDOM(task) {
+            // Remove empty state message
+            const emptyState = taskList.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            const taskItem = document.createElement('li');
+            taskItem.className = 'task-item';
+            taskItem.id = `task-${task.id}`;
+
+            taskItem.innerHTML = `
+                <input 
+                    type="checkbox" 
+                    ${task.completed ? 'checked' : ''}
+                    aria-label="Mark task as complete"
+                    data-task-id="${task.id}"
+                    class="task-checkbox"
+                >
+                <span class="task-text">${escapeHtml(task.text)}</span>
+                <button 
+                    class="delete-btn" 
+                    aria-label="Delete task"
+                    data-task-id="${task.id}"
+                >
+                    Delete
+                </button>
+            `;
+
+            // Add checkbox event listener
+            const checkbox = taskItem.querySelector('.task-checkbox');
+            checkbox.addEventListener('change', toggleTask);
+
+            // Add delete button event listener
+            const deleteBtn = taskItem.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', deleteTask);
+
+            taskList.appendChild(taskItem);
+        }
+
+        /**
+         * Toggle task completion status
+         * Test Case 3: Checking/unchecking should apply strikethrough styling
+         */
+        function toggleTask(e) {
+            const taskId = parseInt(e.target.dataset.taskId);
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === taskId);
+
+            if (task) {
+                task.completed = e.target.checked;
+                saveTasks();
+            }
+        }
+
+        /**
+         * Delete a task from the list
+         * Test Case 4: Deleting a task should remove it from DOM and storage
+         */
+        function deleteTask(e) {
+            const taskId = parseInt(e.target.dataset.taskId);
+            const taskElement = document.getElementById(`task-${taskId}`);
+            
+            if (taskElement) {
+                taskElement.remove();
+            }
+
+            const tasks = getTasks();
+            const filtered = tasks.filter(t => t.id !== taskId);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+
+            // Show empty state if no tasks remain
+            if (filtered.length === 0) {
+                taskList.innerHTML = '<li class="empty-state">No tasks yet. Add one to get started!</li>';
+            }
+        }
+
+        /**
+         * Save all tasks to localStorage
+         */
+        function saveTasks() {
+            const tasks = [];
+            document.querySelectorAll('.task-item').forEach(item => {
+                const checkbox = item.querySelector('.task-checkbox');
+                const text = item.querySelector('.task-text');
+                tasks.push({
+                    id: parseInt(checkbox.dataset.taskId),
+                    text: text.textContent,
+                    completed: checkbox.checked
+                });
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        }
+
+        /**
+         * Load tasks from localStorage
+         */
+        function loadTasks() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const tasks = JSON.parse(stored);
+                taskList.innerHTML = '';
+                if (tasks.length === 0) {
+                    taskList.innerHTML = '<li class="empty-state">No tasks yet. Add one to get started!</li>';
+                } else {
+                    tasks.forEach(task => addTaskToDOM(task));
+                }
+            }
+        }
+
+        /**
+         * Retrieve all tasks from localStorage
+         * 
+         * @returns {Array} Array of task objects
+         */
+        function getTasks() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        /**
+         * Escape HTML special characters to prevent XSS attacks
+         * 
+         * @param {string} text - Text to escape
+         * @returns {string} Escaped text
+         */
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, char => map[char]);
+        }
+
+        // Initialize app on page load
+        initApp();
+
+        /**
+         * TEST CASES:
+         * 
+         * Test 1: Add Valid Task
+         * - Input: "Buy groceries"
+         * - Expected: Task appears in list
+         * 
+         * Test 2: Add Empty Task
+         * - Input: ""
+         * - Expected: Alert shown, task not added
+         * 
+         * Test 3: Mark Task Complete
+         * - Action: Click checkbox
+         * - Expected: Text gets strikethrough, state persists on reload
+         * 
+         * Test 4: Delete Task
+         * - Action: Click delete button
+         * - Expected: Task removed from DOM and localStorage
+         * 
+         * Test 5: Persistence
+         * - Action: Add task, reload page
+         * - Expected: Task still present
+         * 
+         * Test 6: Enter Key Support
+         * - Action: Type task, press Enter
+         * - Expected: Task added without clicking button
+         */
+    </script>
+</body>
+</html>
